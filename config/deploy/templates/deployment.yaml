@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace}}
+  labels:
+    app: {{ .Values.appName}}
+  name: {{ .Values.appName}}
+spec:
+  replicas: {{ .Values.replicas}}
+  selector:
+    matchLabels:
+      app: {{ .Values.appName}}
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName}}
+    spec:
+      containers:
+        - image: {{ .Values.imageName}}
+          name: {{ .Values.appName}}-{{ randAlphaNum 5 | lower }}
+          livenessProbe:
+            initialDelaySeconds: 10
+            failureThreshold: 300
+            periodSeconds: 10
+            timeoutSeconds: 10
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.targetPort}}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.targetPort}}
+            initialDelaySeconds: 10
+            periodSeconds: 3
+            timeoutSeconds: 600
+          startupProbe:
+            periodSeconds: 10
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 10
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.targetPort}}
+
+

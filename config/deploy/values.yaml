@@ -1,0 +1,33 @@
+appName: hello-world-backend
+imageName: ahm3d89/my-hello-world:v1.0.0
+replicas: 1
+serviceName: hello-world-svc
+servicePort: 9999 # port of the service
+targetPort: 8080 # port exposed at docker
+namespace: my-test
+startupProbe:
+  periodSeconds: 5
+  initialDelaySeconds: 5
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 10
+  httpGet:
+    path: /actuator/health/readiness
+    port: 7778
+    host: localhost
+livenessProbe:
+  initialDelaySeconds: 1
+  failureThreshold: 300
+  periodSeconds: 1
+  timeoutSeconds: 1
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8080
+    host: localhost
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 3
+  timeoutSeconds: 600
